@@ -136,8 +136,8 @@ public:
         else if(oe->status == osEventMail || oe->status == osEventMessage){
             se.evt = (State::Event_type)((State::Msg*)oe->value.p)->sig;                    
             invokeHandler(&se);
-			//@21Feb2018.001 libera recursos del mensaje una vez procesado
-			State::Msg* st_msg = (State::Msg*)se->oe->value.p;
+			//@21Feb2018.002 libera recursos del mensaje una vez procesado
+			State::Msg* st_msg = (State::Msg*)(se.oe->value.p);
 			if(st_msg->msg != NULL){
 				Heap::memFree(st_msg->msg);
 			}
