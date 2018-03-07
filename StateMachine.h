@@ -1,10 +1,13 @@
 /*
  * StateMachine.h
  *
- *  Versión: 13 Feb 2018
+ *  Versión: 7 Mar 2018
  *  Author: raulMrello
  *
  *	Framework para funcionalidades HSM
+ *
+ *	Changelog
+ *	@7Mar2018.001 Modifico callback _put_cb para que devuelva un osStatus
  */
  
 #ifndef STATEMACHINE_H
@@ -118,7 +121,7 @@ public:
     *  @param putMsgCb Callback para publicar mensajes, en el caso de que utilice un Mail o Queue externo. Si no
     *         utilizará por defecto Signals.
     */
-    void attachMessageHandler(Callback<void(State::Msg*)> *putMsgCb=0){
+    void attachMessageHandler(Callback<osStatus(State::Msg*)> *putMsgCb=0){
         _put_cb = putMsgCb;
     }
     
@@ -136,7 +139,7 @@ public:
         else if(oe->status == osEventMail || oe->status == osEventMessage){
             se.evt = (State::Event_type)((State::Msg*)oe->value.p)->sig;                    
             invokeHandler(&se);
-			//@21Feb2018.003 libera recursos del mensaje una vez procesado
+			//@21Feb2018.001 libera recursos del mensaje una vez procesado
 			State::Msg* st_msg = (State::Msg*)(se.oe->value.p);
 			if(st_msg->msg != NULL){
 				Heap::memFree(st_msg->msg);
@@ -256,7 +259,10 @@ public:
                 }
                 pmsg->sig = evt;
                 pmsg->msg = 0;
-                _put_cb->call(pmsg);
+                if(_put_cb->call(pmsg) != osOK){
+                	Heap::memFree(pmsg);
+                	pmsg = NULL;
+                }
                 return pmsg;
             }
         }
@@ -269,7 +275,7 @@ private:
     const State::Msg _timedMsg;
     const State::Msg _invalidMsg;    
 
-    Callback<void(State::Msg*)> *_put_cb;
+    Callback<osStatus(State::Msg*)> *_put_cb;
     State*    _curr;
     State*    _next;
     State*    _parent;

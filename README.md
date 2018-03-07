@@ -7,6 +7,13 @@ StateMachine es un framework que proporciona funcionalidades de máquinas de esta
   
 ## Changelog
 
+*07.03.2018*
+>**"Cambio callback put_cb para devolver osStatus"**
+>
+- [x] @7Mar2018.001 Cambio resultado para mejorar control de mutex, en caso de timeout.
+  
+
+
 *21.02.2018*
 >**"Gestión de eventos IGNORED que deben invocar a Heap::memFree (bug.002 corregido)"**
 >
@@ -14,7 +21,7 @@ StateMachine es un framework que proporciona funcionalidades de máquinas de esta
   
 
 
-  *13.02.2018*
+*13.02.2018*
 >**"Compatibilidad MBED y ESP-IDF"**
 >
 - [x] Compatibilizo para que sea funcional en ambas plataformas.
