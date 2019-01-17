@@ -11,6 +11,7 @@ It requires ```arm mbed api``` and ```Heap``` utility from ```MQLib``` project [
 
 ---
 ### **17 Jan 2019**
+- [x] Added ```component.mk```
 - [x] Removed ```test``` folder
 
 ---
