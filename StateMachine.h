@@ -1,7 +1,7 @@
 /*
  * StateMachine.h
  *
- *  Versión: 7 Mar 2018
+ *  Versiï¿½n: 7 Mar 2018
  *  Author: raulMrello
  *
  *	Framework para funcionalidades HSM
@@ -32,12 +32,12 @@ public:
         TRANSITION
     };
 
-    /** Lista de eventos básicos en un estado */
+    /** Lista de eventos bï¿½sicos en un estado */
     enum Event_type{
         EV_ENTRY         = (1<<0),  /// Evento al entrar en un estado
         EV_EXIT          = (1<<1),  /// Evento al salir de un estado
         EV_TIMED         = (1<<2),  /// Evento al cumplir el timeout de espera
-        EV_INVALID       = (1<<3),  /// Evento al obtener un mensaje inválido
+        EV_INVALID       = (1<<3),  /// Evento al obtener un mensaje invï¿½lido
         EV_RESERVED_USER = (1<<4)   /// Eventos reservados al usuario
     };
     
@@ -53,13 +53,13 @@ public:
         void*    msg;
     };
   
-    /** definición de un manejador de eventos como un puntero a función */
+    /** definiciï¿½n de un manejador de eventos como un puntero a funciï¿½n */
     typedef Callback<State::StateResult(State::StateEvent*)> EventHandler;
 
     /** Constructor
-     *  Asigna un número de manejadores de eventos máximo (por defecto 3) sin contar
+     *  Asigna un nï¿½mero de manejadores de eventos mï¿½ximo (por defecto 3) sin contar
      *  los manejadores de eventos Entry, Exit, Timed.
-     *  @param num_hnd Número máximo de manejadores de eventos
+     *  @param num_hnd Nï¿½mero mï¿½ximo de manejadores de eventos
      */
     State(){
         _handler = callback(this, &State::defaultHandler);
@@ -116,10 +116,10 @@ public:
 
     
     /** attachMessageHandler()
-    *  Instala callback para postear mensajes en caso de utilizar un Mail o Queue externos. Por defecto, si ésta
-    *  instalación no se lleva a cabo, se trabajará únicamente con señales.
+    *  Instala callback para postear mensajes en caso de utilizar un Mail o Queue externos. Por defecto, si ï¿½sta
+    *  instalaciï¿½n no se lleva a cabo, se trabajarï¿½ ï¿½nicamente con seï¿½ales.
     *  @param putMsgCb Callback para publicar mensajes, en el caso de que utilice un Mail o Queue externo. Si no
-    *         utilizará por defecto Signals.
+    *         utilizarï¿½ por defecto Signals.
     */
     void attachMessageHandler(Callback<osStatus(State::Msg*)> *putMsgCb=0){
         _put_cb = putMsgCb;
@@ -127,7 +127,7 @@ public:
     
     
     /** run()
-     *  Ejecuta la máquina de estados
+     *  Ejecuta la mï¿½quina de estados
      */
     void run(osEvent* oe){
         State::StateEvent se;
@@ -164,7 +164,7 @@ public:
     }    
      
     /** initState()
-     *  Inicia la máquina de estados a un estado por defecto
+     *  Inicia la mï¿½quina de estados a un estado por defecto
      *  @param st Estado al que conmutar
      *  @parm tid Contexto thread sobre el que notificar
      *
@@ -175,12 +175,11 @@ public:
         }
         _curr = st;
         _next = NullState;
-        _parent = NullState;
         raiseEvent(State::EV_ENTRY, tid);        
     }
      
     /** tranState()
-     *  Cambia de estado (transición). En caso de ser el primero, fuerza su inicio
+     *  Cambia de estado (transiciï¿½n). En caso de ser el primero, fuerza su inicio
      *  @param st Estado al que conmutar
      *  @parm tid Contexto thread sobre el que notificar
      *
@@ -228,7 +227,7 @@ public:
      *  @return Puntero a la zona de memoria reservada, si es necesario (liberar externamente cuando toque)
      */
     State::Msg* raiseEvent(uint32_t evt, osThreadId tid = 0){
-        // si sólo utiliza señales...
+        // si sï¿½lo utiliza seï¿½ales...
         if(!_put_cb){
             if(!tid){
                 tid = osThreadGetId();
@@ -238,6 +237,7 @@ public:
         }
         switch(evt){
             case State::EV_ENTRY:{
+                _parent = NullState;
                 _put_cb->call((State::Msg*)&_entryMsg);
                 return 0;
             }
