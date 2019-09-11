@@ -175,6 +175,7 @@ public:
         }
         _curr = st;
         _next = NullState;
+        _parent = NullState;
         raiseEvent(State::EV_ENTRY, tid);        
     }
      
