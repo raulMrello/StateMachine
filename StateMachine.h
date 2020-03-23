@@ -33,7 +33,7 @@ public:
     };
 
     /** Lista de eventos b�sicos en un estado */
-    enum Event_type{
+    enum Event_type : uint64_t {
         EV_ENTRY         = (1<<0),  /// Evento al entrar en un estado
         EV_EXIT          = (1<<1),  /// Evento al salir de un estado
         EV_TIMED         = (1<<2),  /// Evento al cumplir el timeout de espera
