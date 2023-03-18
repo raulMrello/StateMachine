@@ -33,7 +33,16 @@ public:
     };
 
     /** Lista de eventos b�sicos en un estado */
-    enum Event_type{
+    enum class Event_type : uint64_t{
+        EV_ENTRY_UI64         = ((uint64_t) 1<<0),  /// Evento al entrar en un estado
+        EV_EXIT_UI64          = ((uint64_t) 1<<1),  /// Evento al salir de un estado
+        EV_TIMED_UI64         = ((uint64_t) 1<<2),  /// Evento al cumplir el timeout de espera
+        EV_INVALID_UI64       = ((uint64_t) 1<<3),  /// Evento al obtener un mensaje inv�lido
+        EV_RESERVED_USER_UI64 = ((uint64_t) 1<<4)   /// Eventos reservados al usuario
+    };
+
+    /** Lista de eventos b�sicos en un estado */
+    enum Event_type32{
         EV_ENTRY         = (1<<0),  /// Evento al entrar en un estado
         EV_EXIT          = (1<<1),  /// Evento al salir de un estado
         EV_TIMED         = (1<<2),  /// Evento al cumplir el timeout de espera
@@ -49,7 +58,7 @@ public:
 
     /** Estructura de mensajes encolados soportado por los estados */
     struct Msg{
-        uint32_t sig;
+        uint64_t sig;
         void*    msg;
     };
   
@@ -133,7 +142,7 @@ public:
         State::StateEvent se;
         se.oe = oe;
         if(oe->status == osEventTimeout){
-            se.evt = State::EV_TIMED;
+            se.evt = (State::Event_type)State::EV_TIMED;
             invokeHandler(&se);
         }
         else if(oe->status == osEventMail || oe->status == osEventMessage){
