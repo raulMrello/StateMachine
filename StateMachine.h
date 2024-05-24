@@ -15,6 +15,7 @@
 
 #include "mbed.h"
 #include "Heap.h"
+#include "Blob.h"
 
   
 //---------------------------------------------------------------------------------
@@ -62,6 +63,7 @@ public:
         uint64_t sig;
         void*    msg;
         int moduleId;
+        int size;
     };
   
     /** definici�n de un manejador de eventos como un puntero a funci�n */
@@ -143,17 +145,24 @@ public:
     void run(osEvent* oe){
         State::StateEvent se;
         se.oe = oe;
+        DEBUG_TRACE_D(true, "[StateMachine]....", "Status to process: %ld", oe->status);
         if(oe->status == osEventTimeout){
             se.evt = (State::Event_type)State::EV_TIMED;
             invokeHandler(&se);
         }
         else if(oe->status == osEventMail || oe->status == osEventMessage){
+            DEBUG_TRACE_D(true, "[StateMachine]....", "sizeof(BaseMsg): %d", sizeof(Blob::BaseMsg_t));
             se.evt = (State::Event_type)((State::Msg*)oe->value.p)->sig;                    
             invokeHandler(&se);
 			//@21Feb2018.001 libera recursos del mensaje una vez procesado
 			State::Msg* st_msg = (State::Msg*)(se.oe->value.p);
+            DEBUG_TRACE_D(true, "[StateMachine]....", "sizeof: %d", st_msg->size);
 			if(st_msg->msg != NULL){
-				Heap::memFree(st_msg->msg);
+                DEBUG_TRACE_D(true, "[StateMachine]....", "sizeof: %d - sizeof(GlobalMessage): %d - sizeof(SetReqMessage): %d - sizeof(GetReqMessage): %d - moduleId: %d - evt: %lld", st_msg->size, sizeof(Blob::GlobalMessage_t), sizeof(Blob::SetRequest_t), sizeof(Blob::GetRequest_t), st_msg->moduleId, (uint64_t)se.evt);
+                if(Blob::checkType(st_msg->size)==Blob::GlobalMessageType::None)
+                    Heap::memFree(st_msg->msg);
+                else
+                    delete((Blob::GlobalMessage_t*)st_msg->msg);
 			}
 			if(st_msg != NULL && st_msg != &_entryMsg && st_msg != &_exitMsg && st_msg != &_timedMsg && st_msg != &_invalidMsg){
 				Heap::memFree(st_msg);
