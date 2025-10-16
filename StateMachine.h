@@ -62,6 +62,8 @@ public:
         uint64_t sig;
         void*    msg;
         int moduleId;
+        Msg(): sig(0), msg(NULL), moduleId(-1) {}
+        Msg(uint64_t s, void* m, int modId): sig(s), msg(m), moduleId(modId) {}
     };
   
     /** definici�n de un manejador de eventos como un puntero a funci�n */
@@ -115,10 +117,10 @@ public:
     /** StateMachine()
     *  Constructor por defecto
      */
-    StateMachine() : _entryMsg((State::Msg){State::EV_ENTRY, 0}),
-                     _exitMsg((State::Msg){State::EV_EXIT, 0}),
-                     _timedMsg((State::Msg){State::EV_TIMED, 0}),
-                     _invalidMsg((State::Msg){State::EV_INVALID, 0}){
+    StateMachine() : _entryMsg(State::EV_ENTRY, nullptr, -1),
+                     _exitMsg(State::EV_EXIT, nullptr, -1),
+                     _timedMsg(State::EV_TIMED, nullptr, -1),
+                     _invalidMsg(State::EV_INVALID, nullptr, -1){
         _put_cb = 0;
         _curr = NullState;
         _next = NullState;
@@ -173,6 +175,10 @@ public:
             }while (sig != 0); 
         }         
     }    
+
+    void setCurr(State* st){
+        _curr = st;
+    }
      
     /** initState()
      *  Inicia la m�quina de estados a un estado por defecto
