@@ -150,15 +150,20 @@ public:
             invokeHandler(&se);
         }
         else if(oe->status == osEventMail || oe->status == osEventMessage){
-            se.evt = (State::Event_type)((State::Msg*)oe->value.p)->sig;                    
-            invokeHandler(&se);
-			//@21Feb2018.001 libera recursos del mensaje una vez procesado
 			State::Msg* st_msg = (State::Msg*)(se.oe->value.p);
-			if(st_msg->msg != NULL){
-				Heap::memFree(st_msg->msg);
-			}
-			if(st_msg != NULL && st_msg != &_entryMsg && st_msg != &_exitMsg && st_msg != &_timedMsg && st_msg != &_invalidMsg){
-				Heap::memFree(st_msg);
+			if(st_msg != NULL){
+				se.evt = (State::Event_type)st_msg->sig;
+				invokeHandler(&se);
+				//@21Feb2018.001 libera recursos del mensaje una vez procesado
+				if(st_msg->msg != NULL){
+					Heap::memFree(st_msg->msg);
+				}
+				if(st_msg->sig != State::EV_ENTRY &&
+				   st_msg->sig != State::EV_EXIT &&
+				   st_msg->sig != State::EV_TIMED &&
+				   st_msg->sig != State::EV_INVALID){
+					delete st_msg;
+				}
 			}
         }
         else if(oe->status == osEventSignal){   
@@ -271,14 +276,12 @@ public:
                 return 0;
             }
             default:{
-                State::Msg* pmsg = (State::Msg*)Heap::memAlloc(sizeof(State::Msg));
+                State::Msg* pmsg = new State::Msg(evt, nullptr, -1);
                 if(!pmsg){
                     return 0;
                 }
-                pmsg->sig = evt;
-                pmsg->msg = 0;
                 if(_put_cb->call(pmsg) != osOK){
-                	Heap::memFree(pmsg);
+                    delete pmsg;
                 	pmsg = NULL;
                 }
                 return pmsg;
@@ -288,10 +291,10 @@ public:
          
 private:
 
-    const State::Msg _entryMsg;
-    const State::Msg _exitMsg;
-    const State::Msg _timedMsg;
-    const State::Msg _invalidMsg;    
+    State::Msg _entryMsg;
+    State::Msg _exitMsg;
+    State::Msg _timedMsg;
+    State::Msg _invalidMsg;
 
     Callback<osStatus(State::Msg*)> *_put_cb;
     State*    _curr;
